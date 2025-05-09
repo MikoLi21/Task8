@@ -1,4 +1,7 @@
-﻿namespace Tutorial8.Models.DTOs;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Tutorial8.Models.DTOs;
 
 public class TripDTO
 {

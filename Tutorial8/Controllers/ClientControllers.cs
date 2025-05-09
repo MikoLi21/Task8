@@ -18,32 +18,28 @@ public class ClientsController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateClient([FromBody] CreateClientDTO dto)
     {
-        if (IsClientDtoInvalid(dto))
+        // Простенька валідація (можна посилити за потреби)
+        if (string.IsNullOrWhiteSpace(dto.FirstName) ||
+            string.IsNullOrWhiteSpace(dto.LastName) ||
+            string.IsNullOrWhiteSpace(dto.Email) ||
+            string.IsNullOrWhiteSpace(dto.Telephone) ||
+            string.IsNullOrWhiteSpace(dto.Pesel))
         {
             return BadRequest("All fields are required.");
         }
 
         try
         {
-            var createdClientId = await _tripsService.CreateClientAsync(dto);
-            return CreatedAtAction(nameof(CreateClient), new { id = createdClientId }, new { Id = createdClientId });
+            var newClientId = await _tripsService.CreateClientAsync(dto);
+            return Created($"/api/clients/{newClientId}", new { Id = newClientId });
         }
         catch (InvalidOperationException ex)
         {
             return Conflict(ex.Message);
         }
-        catch
+        catch (Exception)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while creating the client.");
+            return StatusCode(500, "An error occurred while creating the client.");
         }
-    }
-
-    private static bool IsClientDtoInvalid(CreateClientDTO dto)
-    {
-        return string.IsNullOrWhiteSpace(dto.FirstName) ||
-               string.IsNullOrWhiteSpace(dto.LastName) ||
-               string.IsNullOrWhiteSpace(dto.Email) ||
-               string.IsNullOrWhiteSpace(dto.Telephone) ||
-               string.IsNullOrWhiteSpace(dto.Pesel);
     }
 }
